@@ -15,26 +15,26 @@
  * @category   Zend
  * @package    Zend_Media
  * @subpackage ID3
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
 
 /**#@+ @ignore */
-require_once 'Zend/Media/Exception.php';
+require_once 'Zend/Media/Id3/NumberFrame.php';
 /**#@-*/
 
 /**
- * The ID3_Exception is thrown whenever an error occurs within the
- * {@link Zend_Media_Id3v1} or the {@link Zend_Media_Id3v2} classes.
+ * The <i>Length</i> frame contains the length of the audio file in
+ * milliseconds.
  *
  * @category   Zend
  * @package    Zend_Media
  * @subpackage ID3
  * @author     Sven Vollbehr <sven@vollbehr.eu>
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
-class Zend_Media_Id3_Exception extends Zend_Media_Exception
+final class Zend_Media_Id3_Frame_Tlen extends Zend_Media_Id3_NumberFrame
 {}

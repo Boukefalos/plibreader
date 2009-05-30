@@ -69,7 +69,8 @@ class Zend_Io_Reader
         if (!is_resource($fd) ||
             !in_array(get_resource_type($fd), array('stream'))) {
             require_once('Zend/Io/Exception.php');
-            throw new Zend_Io_Exception('Invalid resource type (only resources of type stream are supported)');
+            throw new Zend_Io_Exception
+                ('Invalid resource type (only resources of type stream are supported)');
         }
 
         $this->_fd = $fd;
@@ -497,7 +498,8 @@ class Zend_Io_Reader
      * @throws Zend_Io_Exception if <var>length</var> attribute is negative or
      *  if an I/O error occurs
      */
-    public final function readString16($length, &$order = null, $trimOrder = false)
+    public final function readString16
+        ($length, &$order = null, $trimOrder = false)
     {
         $value = $this->read($length);
 

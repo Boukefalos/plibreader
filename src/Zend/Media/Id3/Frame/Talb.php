@@ -15,26 +15,26 @@
  * @category   Zend
  * @package    Zend_Media
  * @subpackage ID3
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
 
 /**#@+ @ignore */
-require_once 'Zend/Media/Exception.php';
+require_once 'Zend/Media/Id3/TextFrame.php';
 /**#@-*/
 
 /**
- * The ID3_Exception is thrown whenever an error occurs within the
- * {@link Zend_Media_Id3v1} or the {@link Zend_Media_Id3v2} classes.
+ * The <i>Album/Movie/Show title</i> frame is intended for the title of the
+ * recording (or source of sound) from which the audio in the file is taken.
  *
  * @category   Zend
  * @package    Zend_Media
  * @subpackage ID3
  * @author     Sven Vollbehr <sven@vollbehr.eu>
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
-class Zend_Media_Id3_Exception extends Zend_Media_Exception
+final class Zend_Media_Id3_Frame_Talb extends Zend_Media_Id3_TextFrame
 {}

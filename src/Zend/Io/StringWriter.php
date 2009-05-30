@@ -39,22 +39,41 @@ class Zend_Io_StringWriter extends Zend_Io_Writer
     /**
      * Constructs the Zend_Io_StringWriter class with given source string.
      *
-     * @param string $data The string to use as the source.
+     * @param string  $data   The string to use as the source.
+     * @param integer $length If the <var>length</var> argument is given,
+     *  reading will stop after <var>length</var> bytes have been read or
+     *  the end of string is reached, whichever comes first.
      * @throws Zend_Io_Exception if an I/O error occurs
      */
-    public function __construct($data = null)
+    public function __construct($data = null, $length = null)
     {
         if (($this->_fd = fopen('php://memory', 'w+b')) === false) {
             require_once('Zend/Io/Exception.php');
             throw new Zend_Io_Exception('Unable to open php://memory stream');
         }
         if ($data !== null && is_string($data)) {
-            if (($this->_size = fwrite($this->_fd, $data, $tagSize)) === false) {
+            if ($length === null) {
+                $length = strlen($data);
+            }
+            if (($this->_size = fwrite($this->_fd, $data, $length)) === false) {
                 require_once('Zend/Io/Exception.php');
-                throw new Zend_Io_Exception('Unable to write data to php://memory stream');
+                throw new Zend_Io_Exception
+                    ('Unable to write data to php://memory stream');
             }
             fseek($this->_fd, 0);
         }
+    }
+
+    /**
+     * Returns the string representation of this class.
+     */
+    public function toString()
+    {
+        $offset = $this->getOffset();
+        $this->setOffset(0);
+        $data = fread($this->getFileDescriptor(), $this->getSize());
+        $this->setOffset($offset);
+        return $data;
     }
 
     /**

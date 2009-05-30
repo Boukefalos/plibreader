@@ -14,7 +14,7 @@
  *
  * @category   Zend
  * @package    Zend_Media
- * @subpackage Id3
+ * @subpackage ID3
  * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
@@ -29,7 +29,7 @@ require_once 'Zend/Exception.php';
  *
  * @category   Zend
  * @package    Zend_Media
- * @subpackage Id3
+ * @subpackage ID3
  * @author     Sven Vollbehr <sven@vollbehr.eu>
  * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License

@@ -67,9 +67,10 @@ class Zend_Io_Writer
     public function __construct($fd)
     {
         if (!is_resource($fd) ||
-            !in_array(get_resource_type($fd), array('stream'))) {
+                !in_array(get_resource_type($fd), array('stream'))) {
             require_once('Zend/Io/Exception.php');
-            throw new Zend_Io_Exception('Invalid resource type (only resources of type stream are supported)');
+            throw new Zend_Io_Exception
+                ('Invalid resource type (only resources of type stream are supported)');
         }
 
         $this->_fd = $fd;
@@ -174,7 +175,11 @@ class Zend_Io_Writer
             require_once('Zend/Io/Exception.php');
             throw new Zend_Io_Exception('Cannot operate on a closed stream');
         }
-        fwrite($this->_fd, $value, $length === null ? strlen($value) : $length);
+        if ($length === null) {
+            $length = strlen($value);
+        }
+        fwrite($this->_fd, $value, $length);
+        $this->_size += $length;
         return $this;
     }
 
@@ -197,7 +202,7 @@ class Zend_Io_Writer
      * @return Zend_Io_Writer
      * @throws Zend_Io_Exception if the stream is closed
      */
-    public final function writeUInt8()
+    public final function writeUInt8($value)
     {
         return $this->write(pack('C*', $value));
     }
@@ -223,7 +228,7 @@ class Zend_Io_Writer
      */
     public final function writeInt16LE($value)
     {
-        if ($this->_isBigEndian()) {
+        if ($this->_isLittleEndian()) {
             return $this->write(strrev($this->_toInt16($value)));
         } else {
             return $this->write($this->_toInt16($value));
@@ -240,7 +245,7 @@ class Zend_Io_Writer
      */
     public final function writeInt16BE($value)
     {
-        if ($this->_isLittleEndian()) {
+        if ($this->_isBigEndian()) {
             return $this->write(strrev($this->_toInt16($value)));
         } else {
             return $this->write($this->_toInt16($value));
@@ -294,7 +299,7 @@ class Zend_Io_Writer
      */
     public final function writeInt32LE($value)
     {
-        if ($this->_isBigEndian()) {
+        if ($this->_isLittleEndian()) {
             return $this->write(strrev($this->_toInt32($value)));
         } else {
             return $this->write($this->_toInt32($value));
@@ -311,7 +316,7 @@ class Zend_Io_Writer
      */
     public final function writeInt32BE($value)
     {
-        if ($this->_isLittleEndian()) {
+        if ($this->_isBigEndian()) {
             return $this->write(strrev($this->_toInt32($value)));
         } else {
             return $this->write($this->_toInt32($value));
@@ -354,7 +359,8 @@ class Zend_Io_Writer
      */
     public final function writeInt64LE($value)
     {
-        return $this->write(pack('V*', $value & 0xffffffff, $value / (0xffffffff+1)));
+        return $this->write
+            (pack('V*', $value & 0xffffffff, $value / (0xffffffff+1)));
     }
 
     /**
@@ -367,7 +373,8 @@ class Zend_Io_Writer
      */
     public final function writeInt64BE($value)
     {
-        return $this->write(pack('N*', $value / (0xffffffff+1), $value & 0xffffffff));
+        return $this->write
+            (pack('N*', $value / (0xffffffff+1), $value & 0xffffffff));
     }
 
     /**
@@ -391,7 +398,7 @@ class Zend_Io_Writer
      */
     public final function writeFloatLE($value)
     {
-        if ($this->_isBigEndian()) {
+        if ($this->_isLittleEndian()) {
             return $this->write(strrev($this->_toFloat($value)));
         } else {
             return $this->write($this->_toFloat($value));
@@ -408,7 +415,7 @@ class Zend_Io_Writer
      */
     public final function writeFloatBE($value)
     {
-        if ($this->_isLittleEndian()) {
+        if ($this->_isBigEndian()) {
             return $this->write(strrev($this->_toFloat($value)));
         } else {
             return $this->write($this->_toFloat($value));

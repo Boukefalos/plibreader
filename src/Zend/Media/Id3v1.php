@@ -14,7 +14,7 @@
  *
  * @category   Zend
  * @package    Zend_Media
- * @subpackage Id3
+ * @subpackage ID3
  * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
@@ -30,7 +30,7 @@ require_once 'Zend/Io/FileReader.php';
  *
  * @category   Zend
  * @package    Zend_Media
- * @subpackage Id3
+ * @subpackage ID3
  * @author     Sven Vollbehr <sven@vollbehr.eu>
  * @author     Ryan Butterfield <buttza@gmail.com>
  * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)

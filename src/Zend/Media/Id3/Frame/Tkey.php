@@ -15,26 +15,29 @@
  * @category   Zend
  * @package    Zend_Media
  * @subpackage ID3
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
 
 /**#@+ @ignore */
-require_once 'Zend/Media/Exception.php';
+require_once 'Zend/Media/Id3/TextFrame.php';
 /**#@-*/
 
 /**
- * The ID3_Exception is thrown whenever an error occurs within the
- * {@link Zend_Media_Id3v1} or the {@link Zend_Media_Id3v2} classes.
+ * The <i>Initial key</i> frame contains the musical key in which the sound
+ * starts. It is represented as a string with a maximum length of three
+ * characters. The ground keys are represented with 'A', 'B', 'C', 'D', 'E', 'F'
+ * and 'G' and halfkeys represented with 'b' and '#'. Minor is represented as
+ * 'm', e.g. 'Dbm'. Off key is represented with an 'o' only.
  *
  * @category   Zend
  * @package    Zend_Media
  * @subpackage ID3
  * @author     Sven Vollbehr <sven@vollbehr.eu>
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
-class Zend_Media_Id3_Exception extends Zend_Media_Exception
+final class Zend_Media_Id3_Frame_Tkey extends Zend_Media_Id3_TextFrame
 {}

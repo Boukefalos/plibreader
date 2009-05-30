@@ -15,26 +15,27 @@
  * @category   Zend
  * @package    Zend_Media
  * @subpackage ID3
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
 
 /**#@+ @ignore */
-require_once 'Zend/Media/Exception.php';
+require_once 'Zend/Media/Id3/TextFrame.php';
 /**#@-*/
 
 /**
- * The ID3_Exception is thrown whenever an error occurs within the
- * {@link Zend_Media_Id3v1} or the {@link Zend_Media_Id3v2} classes.
+ * The <i>Original lyricist/text writer</i> frame is intended for the text
+ * writer of the original recording, if for example the music in the file should
+ * be a cover of a previously released song.
  *
  * @category   Zend
  * @package    Zend_Media
  * @subpackage ID3
  * @author     Sven Vollbehr <sven@vollbehr.eu>
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
-class Zend_Media_Id3_Exception extends Zend_Media_Exception
+final class Zend_Media_Id3_Frame_Toly extends Zend_Media_Id3_TextFrame
 {}
