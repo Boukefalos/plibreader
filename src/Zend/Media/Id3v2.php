@@ -43,7 +43,6 @@ require_once 'Zend/Media/Id3/Header.php';
  * unique and predefined identifier which allows software to skip unknown
  * frames.
  *
- * @todo       Unsynchronisation not supported for ID3v2.3 tag
  * @category   Zend
  * @package    Zend_Media
  * @subpackage ID3
@@ -134,6 +133,9 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
         }
 
         $this->_header = new Zend_Media_Id3_Header($this->_reader, $options);
+
+        $tagSize = $this->_header->getSize();
+
         if ($this->_header->getVersion() < 3 ||
             $this->_header->getVersion() > 4) {
             require_once 'Zend/Media/Id3/Exception.php';
@@ -142,9 +144,10 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
         }
         if ($this->_header->getVersion() < 4 &&
             $this->_header->hasFlag(Zend_Media_Id3_Header::UNSYNCHRONISATION)) {
-            require_once 'Zend/Media/Id3/Exception.php';
-            throw new Zend_Media_Id3_Exception
-                ('Unsynchronisation not yet supported for this version of ID3v2 tag');
+            $data = $this->_reader->read($this->_header->getSize());
+            $this->_reader = new Zend_Io_StringReader
+                ($this->_decodeUnsynchronisation($data));
+            $tagSize = $this->_reader->getSize();
         }
         $this->clearOption('unsyncronisation');
         if ($this->_header->hasFlag(Zend_Media_Id3_Header::UNSYNCHRONISATION)) {
@@ -164,7 +167,7 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
             $offset = $this->_reader->getOffset();
 
             // Jump off the loop if we reached the end of the tag
-            if ($offset - $startOffset - 10 >= $this->_header->getSize() -
+            if ($offset - $startOffset - 10 >= $tagSize -
                 ($this->hasFooter() ? 10 : 0) - 10 /* header */) {
                 break;
             }
@@ -517,14 +520,32 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
                 $frame->write($buffer);
             }
         }
-        $data = $buffer->toString();
-        $datalen = strlen($data);
-        $padlen = 0;
+        $frameData = $buffer->toString();
+        $frameDataLength = strlen($frameData);
+        $paddingLength = 0;
 
+        // ID3v2.4.0 supports frame level unsynchronisation. The corresponding
+        // option is set to true when any of the frames use the
+        // unsynchronisation scheme.
         if ($this->getOption('unsyncronisation', false) === true) {
             $this->_header->setFlags
                 ($this->_header->getFlags() |
                  Zend_Media_Id3_Header::UNSYNCHRONISATION);
+        }
+
+        // ID3v2.3.0 supports only tag level unsynchronisation
+        if ($this->getOption('version', 4) < 4) {
+            $frameData = $this->_encodeUnsynchronisation($frameData);
+            if (($len = strlen($frameData)) != $frameDataLength) {
+                $frameDataLength = $len;
+                $this->_header->setFlags
+                    ($this->_header->getFlags() |
+                     Zend_Media_Id3_Header::UNSYNCHRONISATION);
+            } else {
+                $this->_header->setFlags
+                    ($this->_header->getFlags() &
+                     ~Zend_Media_Id3_Header::UNSYNCHRONISATION);
+            }
         }
 
         // The tag padding is calculated as follows. If the tag can be written
@@ -534,45 +555,49 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
         // 4096 bytes.
         if ($this->hasFooter() === false) {
             if ($this->_reader !== null &&
-                $datalen < $this->_header->getSize()) {
-                $padlen = $this->_header->getSize() - $datalen;
+                $frameDataLength < $this->_header->getSize()) {
+                $paddingLength = $this->_header->getSize() - $frameDataLength;
             } else {
-                $padlen = 4096;
+                $paddingLength = 4096;
             }
         }
 
         /* ID3v2.4.0 CRC calculated w/ padding */
         if ($this->getOption('version', 4) >= 4) {
-            $data = str_pad($data, $datalen + $padlen, "\0");
+            $frameData =
+                str_pad($frameData, $frameDataLength += $paddingLength, "\0");
         }
 
+        $extendedHeaderData = '';
+        $extendedHeaderDataLength = 0;
         if ($this->hasExtendedHeader()) {
-            $this->_extendedHeader->setPadding($padlen);
+            $this->_extendedHeader->setPadding($paddingLength);
             if ($this->_extendedHeader->hasFlag
                 (Zend_Media_Id3_ExtendedHeader::CRC32)) {
-                $crc = crc32($data);
+                $crc = crc32($frameData);
                 if ($crc & 0x80000000) {
                     $crc = -(($crc ^ 0xffffffff) + 1);
                 }
                 $this->_extendedHeader->setCrc($crc);
             }
+            $buffer = new Zend_Io_StringWriter();
+            $this->_extendedHeader->write($buffer);
+            $extendedHeaderData = $buffer->toString();
+            $extendedHeaderDataLength = strlen($extendedHeaderData);
         }
 
         /* ID3v2.3.0 CRC calculated w/o padding */
         if ($this->getOption('version', 4) < 4) {
-            $data = str_pad($data, $datalen + $padlen, "\0");
+            $frameData =
+                str_pad($frameData, $frameDataLength += $paddingLength, "\0");
         }
 
-        $this->_header->setSize(strlen($data));
+        $this->_header->setSize($extendedHeaderDataLength + $frameDataLength);
 
         $writer->write('ID3');
         $this->_header->write($writer);
-        if ($this->hasExtendedHeader()) {
-            $this->_extendedHeader->write($writer);
-        }
-
-        $writer->write($data);
-
+        $writer->write($extendedHeaderData);
+        $writer->write($frameData);
         if ($this->hasFooter()) {
             $writer->write('3DI');
             $this->_footer->write($writer);

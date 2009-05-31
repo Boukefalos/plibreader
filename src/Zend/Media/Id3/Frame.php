@@ -290,6 +290,10 @@ abstract class Zend_Media_Id3_Frame extends Zend_Media_Id3_Object
         $data = $buffer->toString();
         $size = $this->_size = strlen($data);
 
+        // ID3v2.4.0 supports frame level unsynchronisation. The corresponding
+        // option is set to true when any of the frames use the
+        // unsynchronisation scheme. The usage is denoted by
+        // Zend_Media_Id3_Header flag that is set accordingly upon file write.
         if ($this->getOption('version', 4) >= 4) {
             $data = $this->_encodeUnsynchronisation($data);
             if (($dataLength = strlen($data)) != $size) {
