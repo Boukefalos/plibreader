@@ -70,9 +70,9 @@ abstract class Zend_Media_Id3_Object
      *
      * @return Array
      */
-    public final function getOptions() 
+    public final function &getOptions()
     {
-         return $this->_options; 
+        return $this->_options;
     }
 
     /**
@@ -98,7 +98,7 @@ abstract class Zend_Media_Id3_Object
      */
     public final function setOptions(&$options) 
     {
-         $this->_options = &$options; 
+        $this->_options = &$options; 
     }
 
     /**
@@ -110,6 +110,16 @@ abstract class Zend_Media_Id3_Object
     public final function setOption($option, $value)
     {
         $this->_options[$option] = $value;
+    }
+
+    /**
+     * Clears the given option value.
+     *
+     * @param string $option The name of the option.
+     */
+    public final function clearOption($option)
+    {
+        unset($this->_options[$option]);
     }
 
     /**
