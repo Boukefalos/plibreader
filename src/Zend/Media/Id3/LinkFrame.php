@@ -85,7 +85,7 @@ abstract class Zend_Media_Id3_LinkFrame extends Zend_Media_Id3_Frame
      * @param Zend_Io_Writer $writer The writer object.
      * @return void
      */
-    protected function _writeFrame($writer)
+    protected function _writeData($writer)
     {
         $writer->write($this->_link);
     }

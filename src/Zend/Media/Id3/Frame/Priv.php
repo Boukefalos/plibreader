@@ -117,7 +117,7 @@ final class Zend_Media_Id3_Frame_Priv extends Zend_Media_Id3_Frame
      * @param Zend_Io_Writer $writer The writer object.
      * @return void
      */
-    protected function _writeFrame($writer)
+    protected function _writeData($writer)
     {
         $writer->writeString8($this->_owner, 1)
                ->write($this->_data);

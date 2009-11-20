@@ -115,7 +115,7 @@ final class Zend_Media_Id3_Frame_Sign extends Zend_Media_Id3_Frame
      * @param Zend_Io_Writer $writer The writer object.
      * @return void
      */
-    protected function _writeFrame($writer)
+    protected function _writeData($writer)
     {
         $writer->writeUInt8($this->_group)
                ->write($this->_signature);

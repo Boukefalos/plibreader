@@ -138,18 +138,24 @@ abstract class Zend_Media_Id3_Frame extends Zend_Media_Id3_Object
             if ($this->getOption('version', 4) < 4) {
                 $this->_size = $this->_reader->readUInt32BE();
                 $flags = $this->_reader->readUInt16BE();
-                if (($flags & 0x8000) == 0x8000)
+                if (($flags & 0x8000) == 0x8000) {
                     $this->_flags |= self::DISCARD_ON_TAGCHANGE;
-                if (($flags & 0x4000) == 0x4000)
+                }
+                if (($flags & 0x4000) == 0x4000) {
                     $this->_flags |= self::DISCARD_ON_FILECHANGE;
-                if (($flags & 0x2000) == 0x2000)
+                }
+                if (($flags & 0x2000) == 0x2000) {
                     $this->_flags |= self::READ_ONLY;
-                if (($flags & 0x80) == 0x80)
+                }
+                if (($flags & 0x80) == 0x80) {
                     $this->_flags |= self::COMPRESSION;
-                if (($flags & 0x40) == 0x40)
+                }
+                if (($flags & 0x40) == 0x40) {
                     $this->_flags |= self::ENCRYPTION;
-                if (($flags & 0x20) == 0x20)
+                }
+                if (($flags & 0x20) == 0x20) {
                     $this->_flags |= self::GROUPING_IDENTITY;
+                }
             }
 
             /* ID3v2.4.0 size and flags */
@@ -248,7 +254,7 @@ abstract class Zend_Media_Id3_Frame extends Zend_Media_Id3_Object
      * @param Zend_Io_Writer $writer The writer object.
      * @return void
      */
-    abstract protected function _writeFrame($writer);
+    abstract protected function _writeData($writer);
 
     /**
      * Writes the frame data with the header.
@@ -286,7 +292,7 @@ abstract class Zend_Media_Id3_Frame extends Zend_Media_Id3_Object
             $flags = $this->_flags;
         }
 
-        $this->_writeFrame($buffer = new Zend_Io_StringWriter());
+        $this->_writeData($buffer = new Zend_Io_StringWriter());
         $data = $buffer->toString();
         $size = $this->_size = strlen($data);
 

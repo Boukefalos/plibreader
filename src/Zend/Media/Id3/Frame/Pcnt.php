@@ -99,7 +99,7 @@ final class Zend_Media_Id3_Frame_Pcnt extends Zend_Media_Id3_Frame
      * @param Zend_Io_Writer $writer The writer object.
      * @return void
      */
-    protected function _writeFrame($writer)
+    protected function _writeData($writer)
     {
         if ($this->_counter > 4294967295) {
             $writer->writeInt64BE($this->_counter); // UInt64

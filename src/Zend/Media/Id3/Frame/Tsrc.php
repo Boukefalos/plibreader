@@ -196,11 +196,11 @@ final class Zend_Media_Id3_Frame_Tsrc extends Zend_Media_Id3_TextFrame
      * @param Zend_Io_Writer $writer The writer object.
      * @return void
      */
-    protected function _writeFrame($writer)
+    protected function _writeData($writer)
     {
         $this->setText
             ($this->_country . $this->_registrant . $this->_year .
              $this->_uniqueNumber, Zend_Media_Id3_Encoding::ISO88591);
-        parent::_writeFrame($writer);
+        parent::_writeData($writer);
     }
 }

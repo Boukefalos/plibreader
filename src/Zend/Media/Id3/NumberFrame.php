@@ -85,9 +85,9 @@ abstract class Zend_Media_Id3_NumberFrame
      * @param Zend_Io_Writer $writer The writer object.
      * @return void
      */
-    protected function _writeFrame($writer)
+    protected function _writeData($writer)
     {
         $this->setEncoding(Zend_Media_Id3_Encoding::ISO88591);
-        parent::_writeFrame($writer);
+        parent::_writeData($writer);
     }
 }
