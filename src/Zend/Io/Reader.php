@@ -27,6 +27,7 @@
  * @package    Zend_Io
  * @author     Sven Vollbehr <sven@vollbehr.eu>
  * @author     Ryan Butterfield <buttza@gmail.com>
+ * @author     Marc Bennewitz <marc-bennewitz@arcor.de>
  * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
@@ -208,8 +209,12 @@ class Zend_Io_Reader
      */
     public final function readInt8()
     {
-        list(, $int) = unpack('c*', $this->read(1));
-        return $int;
+        $ord = ord($this->read(1));
+        if ($ord > 127) {
+            return -$ord - 2 * (128 - $ord);
+        } else {
+            return $ord;
+        }
     }
 
     /**
@@ -221,8 +226,7 @@ class Zend_Io_Reader
      */
     public final function readUInt8()
     {
-        list(, $int) = unpack('C*', $this->read(1));
-        return $int;
+        return ord($this->read(1));
     }
 
     /**
@@ -423,49 +427,95 @@ class Zend_Io_Reader
             ($lohi * (0xffff+1) + $lolo);
     }
 
-//    TODO: How to determine float size?
-//
-//    /**
-//     * Returns machine endian ordered binary data as a floating point number.
-//     *
-//     * @param string $value The binary data string.
-//     * @return float
-//     */
-//    private function _fromFloat($value)
-//    {
-//        list(, $float) = unpack('f*', $value);
-//        return $float;
-//    }
-//
-//    /**
-//     * Reads machine dependent size of bytes from the stream and returns
-//     * little-endian ordered binary data as a floating point number.
-//     *
-//     * @return float
-//     * @throws Zend_Io_Exception if an I/O error occurs
-//     */
-//    public final function readFloatLE()
-//    {
-//        if ($this->_isBigEndian())
-//            return $this->_fromFloat(strrev($this->read(?)));
-//        else
-//            return $this->_fromFloat($this->read(?));
-//    }
-//
-//    /**
-//     * Reads machine dependent size of bytes from the stream and returns
-//     * big-endian ordered binary data as a float point number.
-//     *
-//     * @return float
-//     * @throws Zend_Io_Exception if an I/O error occurs
-//     */
-//    public final function readFloatBE()
-//    {
-//        if ($this->_isLittleEndian())
-//            return $this->_fromFloat(strrev($this->read(?)));
-//        else
-//            return $this->_fromFloat($this->read(?));
-//    }
+    /**
+     * Returns machine endian ordered binary data as a 32-bit floating point
+     * number as defined by IEEE 754.
+     *
+     * @param string $value The binary data string.
+     * @return float
+     */
+    private function _fromFloat($value)
+    {
+        list(, $float) = unpack('f', $value);
+        return $float;
+    }
+
+    /**
+     * Reads 4 bytes from the stream and returns little-endian ordered binary
+     * data as a 32-bit float point number as defined by IEEE 754.
+     *
+     * @return float
+     * @throws Zend_Io_Exception if an I/O error occurs
+     */
+    public final function readFloatLE()
+    {
+        if ($this->_isBigEndian()) {
+            return $this->_fromFloat(strrev($this->read(4)));
+        } else {
+            return $this->_fromFloat($this->read(4));
+        }
+    }
+
+    /**
+     * Reads 4 bytes from the stream and returns big-endian ordered binary data
+     * as a 32-bit float point number as defined by IEEE 754.
+     *
+     * @return float
+     * @throws Zend_Io_Exception if an I/O error occurs
+     */
+    public final function readFloatBE()
+    {
+        if ($this->_isLittleEndian()) {
+            return $this->_fromFloat(strrev($this->read(4)));
+        } else {
+            return $this->_fromFloat($this->read(4));
+        }
+    }
+
+    /**
+     * Returns machine endian ordered binary data as a 64-bit floating point
+     * number as defined by IEEE754.
+     *
+     * @param string $value The binary data string.
+     * @return float
+     */
+    private function _fromDouble($value)
+    {
+        list(, $double) = unpack('d', $value);
+        return $double;
+    }
+
+    /**
+     * Reads 8 bytes from the stream and returns little-endian ordered binary
+     * data as a 64-bit floating point number as defined by IEEE 754.
+     *
+     * @return float
+     * @throws Zend_Io_Exception if an I/O error occurs
+     */
+    public final function readDoubleLE()
+    {
+        if ($this->_isBigEndian()) {
+            return $this->_fromDouble(strrev($this->read(8)));
+        } else {
+            return $this->_fromDouble($this->read(8));
+        }
+    }
+
+    /**
+     * Reads 8 bytes from the stream and returns big-endian ordered binary data
+     * as a 64-bit float point number as defined by IEEE 754.
+     *
+     * @return float
+     * @throws Zend_Io_Exception if an I/O error occurs
+     */
+    public final function readDoubleBE()
+    {
+        if ($this->_isLittleEndian()) {
+            return $this->_fromDouble(strrev($this->read(8)));
+        } else {
+            return $this->_fromDouble($this->read(8));
+        }
+    }
 
     /**
      * Reads <var>length</var> amount of bytes from the stream and returns
