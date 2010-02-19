@@ -132,7 +132,8 @@ abstract class Zend_Media_Id3_Frame extends Zend_Media_Id3_Object
         if ($reader === null) {
             $this->_identifier = strtoupper(substr(get_class($this), -4));
         } else {
-            $this->_identifier = $this->_reader->readString8(4, " ");
+            $this->_identifier =
+                strtoupper($this->_reader->readString8(4, " "));
 
             /* ID3v2.3.0 size and flags; convert flags to 2.4.0 format */
             if ($this->getOption('version', 4) < 4) {
@@ -191,7 +192,7 @@ abstract class Zend_Media_Id3_Frame extends Zend_Media_Id3_Object
      */
     public final function getIdentifier() 
     {
-         return $this->_identifier; 
+        return $this->_identifier; 
     }
 
     /**
@@ -213,7 +214,7 @@ abstract class Zend_Media_Id3_Frame extends Zend_Media_Id3_Object
      */
     public final function getSize() 
     {
-         return $this->_size; 
+        return $this->_size; 
     }
 
     /**
@@ -235,7 +236,7 @@ abstract class Zend_Media_Id3_Frame extends Zend_Media_Id3_Object
      */
     public final function getFlags($flags) 
     {
-         return $this->_flags; 
+        return $this->_flags; 
     }
 
     /**
@@ -245,7 +246,7 @@ abstract class Zend_Media_Id3_Frame extends Zend_Media_Id3_Object
      */
     public final function setFlags($flags) 
     {
-         $this->_flags = $flags; 
+        $this->_flags = $flags;
     }
 
     /**

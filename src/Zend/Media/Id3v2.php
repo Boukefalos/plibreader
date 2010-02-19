@@ -21,7 +21,6 @@
  */
 
 /**#@+ @ignore */
-require_once 'Zend/Io/StringWriter.php';
 require_once 'Zend/Media/Id3/Object.php';
 require_once 'Zend/Media/Id3/Header.php';
 /**#@-*/
@@ -111,7 +110,7 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
         if ($filename instanceof Zend_Io_Reader) {
             $this->_reader = &$filename;
         } else {
-            require_once('Zend/Io/FileReader.php');
+            require_once 'Zend/Io/FileReader.php';
             try {
                 $this->_reader = new Zend_Io_FileReader($filename);
             } catch (Zend_Io_Exception $e) {
@@ -140,11 +139,13 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
             $this->_header->getVersion() > 4) {
             require_once 'Zend/Media/Id3/Exception.php';
             throw new Zend_Media_Id3_Exception
-                ('File does not contain ID3v2 tag of supported version');
+                ('File does not contain ID3v2 tag of supported version: v2.' .
+                 $this->_header->getVersion());
         }
         if ($this->_header->getVersion() < 4 &&
             $this->_header->hasFlag(Zend_Media_Id3_Header::UNSYNCHRONISATION)) {
             $data = $this->_reader->read($this->_header->getSize());
+            require_once 'Zend/Io/StringReader.php';
             $this->_reader = new Zend_Io_StringReader
                 ($this->_decodeUnsynchronisation($data));
             $tagSize = $this->_reader->getSize();
@@ -188,12 +189,14 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
             }
 
             $this->_reader->setOffset($offset);
-            if (@fopen($filename = 'Zend/Media/Id3/Frame/' .
-                       strtoupper($identifier) . '.php', 'r', true) !== false) {
-                require_once($filename);
+            if (@fopen($file = 'Zend/Media/Id3/Frame/' .
+                       ucfirst(strtolower($identifier)) . '.php', 'r',
+                       true) !== false) {
+                require_once($file);
             }
             if (class_exists
-                ($classname = 'Zend_Media_Id3_Frame_' . $identifier)) {
+                ($classname = 'Zend_Media_Id3_Frame_' .
+                     ucfirst(strtolower($identifier)))) {
                 $frame = new $classname($this->_reader, $options);
             } else {
                 require_once 'Zend/Media/Id3/Frame/Unknown.php';
@@ -215,7 +218,7 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
      */
     public function getHeader()
     {
-         return $this->_header;
+        return $this->_header;
     }
 
     /**
@@ -286,7 +289,7 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
      */
     public function getFrames()
     {
-         return $this->_frames;
+        return $this->_frames;
     }
 
     /**
@@ -431,7 +434,8 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
      * If write is called without setting any frames to the tag, the tag is
      * removed from the file.
      *
-     * @param string $filename The optional path to the file.
+     * @param string|Zend_Io_Writer $filename The optional path to the file, use
+     *                                        null to save to the same file.
      */
     public function write($filename)
     {
@@ -439,6 +443,10 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
             require_once 'Zend/Media/Id3/Exception.php';
             throw new Zend_Media_Id3_Exception
                 ('No file given to write the tag to');
+        } else if ($filename !== null && $filename instanceof Zend_Io_Writer) {
+            require_once 'Zend/Io/Writer.php';
+            $this->_writeData($filename);
+            return;
         } else if ($filename !== null && $this->_filename !== null &&
                    realpath($filename) != realpath($this->_filename) &&
                    !copy($this->_filename, $filename)) {
@@ -466,8 +474,9 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
                 $oldTagSize = 0;
             }
         }
+        require_once 'Zend/Io/StringWriter.php';
         $tag = new Zend_Io_StringWriter();
-        $this->_writeTag($tag);
+        $this->_writeData($tag);
         $tagSize = empty($this->_frames) ? 0 : $tag->getSize();
 
         if ($tagSize > $oldTagSize || $tagSize == 0) {
@@ -510,7 +519,7 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
      * @param Zend_Io_Writer $writer The writer object.
      * @return void
      */
-    private function _writeTag($writer)
+    private function _writeData($writer)
     {
         $this->clearOption('unsyncronisation');
 
@@ -616,19 +625,21 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
      * @param string $name The frame or field name.
      * @return mixed
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         if (isset($this->_frames[strtoupper($name)])) {
             return $this->_frames[strtoupper($name)][0];
         }
         if (method_exists($this, 'get' . ucfirst($name))) {
-            return call_user_func(array($this, 'get' . ucfirst($name)));
+            return call_user_func
+                (array($this, 'get' . ucfirst($name)));
         }
-        if (@fopen($filename = 'Zend/Media/Id3/Frame/' . strtoupper($name) .
+        if (@fopen($filename = 'Zend/Media/Id3/Frame/' . ucfirst($name) .
                    '.php', 'r', true) !== false) {
             require_once $filename;
         }
         if (class_exists
-            ($classname = 'Zend_Media_Id3_Frame_' . strtoupper($name))) {
+            ($classname = 'Zend_Media_Id3_Frame_' . ucfirst($name))) {
             return $this->addFrame(new $classname());
         }
         require_once 'Zend/Media/Id3/Exception.php';
@@ -655,6 +666,6 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
      */
     public function __unset($name)
     {
-         unset($this->_frames[strtoupper($name)]);
+        unset($this->_frames[strtoupper($name)]);
     }
 }
