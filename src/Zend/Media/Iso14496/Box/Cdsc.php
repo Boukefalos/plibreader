@@ -33,25 +33,12 @@
  */
 
 /**#@+ @ignore */
-require_once 'Zend/Media/Iso14496/FullBox.php';
+require_once 'Zend/Media/Iso14496/Box.php';
 /**#@-*/
 
 /**
- * The <i>Chunk Offset Box</i> table gives the index of each chunk into the
- * containing file. There are two variants, permitting the use of 32-bit or
- * 64-bit offsets. The latter is useful when managing very large presentations.
- * At most one of these variants will occur in any single instance of a sample
- * table.
- *
- * Offsets are file offsets, not the offset into any box within the file (e.g.
- * {@link Zend_Media_Iso14496_Box_Mdat Media Data Box}). This permits referring
- * to media data in files without any box structure. It does also mean that care
- * must be taken when constructing a self-contained ISO file with its metadata
- * ({@link Zend_Media_Iso14496_Box_Moov Movie Box}) at the front, as the size of
- * the {@link Zend_Media_Iso14496_Box_Moov Movie Box} will affect the chunk
- * offsets to the media data.
- *
- * This box variant contains 32-bit offsets.
+ * This box provides a reference from the containing track to another track in
+ * the presentation. This track describes the referenced track.
  *
  * @category   Zend
  * @package    Zend_Media
@@ -61,10 +48,10 @@ require_once 'Zend/Media/Iso14496/FullBox.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
-final class Zend_Media_Iso14496_Box_Stco extends Zend_Media_Iso14496_FullBox
+final class Zend_Media_Iso14496_Box_Cdsc extends Zend_Media_Iso14496_Box
 {
     /** @var Array */
-    private $_chunkOffsetTable = array();
+    private $_trackId = array();
 
     /**
      * Constructs the class with given parameters and reads box related data
@@ -77,34 +64,33 @@ final class Zend_Media_Iso14496_Box_Stco extends Zend_Media_Iso14496_FullBox
     {
         parent::__construct($reader, $options);
 
-        $entryCount = $this->_reader->readUInt32BE();
-        for ($i = 1; $i <= $entryCount; $i++) {
-            $this->_chunkOffsetTable[$i] = $reader->readUInt32BE();
+        while ($this->_reader->getOffset <= $this->getSize()) {
+            $this->_trackId[] = $this->_reader->readUInt32BE();
         }
     }
 
     /**
-     * Returns an array of values. Each entry has the entry number as its index
-     * and a 32 bit integer that gives the offset of the start of a chunk into
-     * its containing media file as its value.
+     * Returns an array of integer references from the containing track to
+     * another track in the presentation. Track IDs are never re-used and cannot
+     * be equal to zero.
      *
-     * @return Array
+     * @return integer
      */
-    public function getChunkOffsetTable() 
+    public function getTrackId() 
     {
-        return $this->_chunkOffsetTable; 
+        return $this->_trackId; 
     }
 
     /**
-     * Sets an array of chunk offsets. Each entry must have the entry number as
-     * its index and a 32 bit integer that gives the offset of the start of a
-     * chunk into its containing media file as its value.
+     * Sets an array of integer references from the containing track to
+     * another track in the presentation. Track IDs are never re-used and cannot
+     * be equal to zero.
      *
-     * @param Array $chunkOffsetTable The chunk offset array.
+     * @param Array $trackId The array of values.
      */
-    public function setChunkOffsetTable($chunkOffsetTable)
+    public function setTrackId($trackId)
     {
-        $this->_chunkOffsetTable = $chunkOffsetTable;
+        $this->_trackId = $trackId;
     }
 
     /**
@@ -114,7 +100,7 @@ final class Zend_Media_Iso14496_Box_Stco extends Zend_Media_Iso14496_FullBox
      */
     public function getHeapSize()
     {
-        return parent::getHeapSize() + 4 + count($this->_chunkOffsetTable) * 4;
+        return parent::getHeapSize() + count($this->_trackId) * 4;
     }
 
     /**
@@ -126,9 +112,8 @@ final class Zend_Media_Iso14496_Box_Stco extends Zend_Media_Iso14496_FullBox
     protected function _writeData($writer)
     {
         parent::_writeData($writer);
-        $writer->writeUInt32BE($entryCount = count($this->_chunkOffsetTable));
-        for ($i = 1; $i <= $entryCount; $i++) {
-            $writer->writeUInt32BE($this->_chunkOffsetTable[$i]);
+        for ($i = 0; $i < count($this->_trackId); $i++) {
+            $writer->writeUInt32BE($this->_trackId[$i]);
         }
     }
 }

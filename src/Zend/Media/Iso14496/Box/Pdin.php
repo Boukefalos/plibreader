@@ -133,7 +133,7 @@ final class Zend_Media_Iso14496_Box_Pdin extends Zend_Media_Iso14496_FullBox
     protected function _writeData($writer)
     {
         parent::_writeData($writer);
-        for ($i = 1; $i <= count($this->_timeToSampleTable); $i++) {
+        for ($i = 0; $i < count($this->_timeToSampleTable); $i++) {
             $writer->writeUInt32BE
                         ($this->_progressiveDownloadInfo[$i]['rate'])
                    ->writeUInt32BE

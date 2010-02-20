@@ -37,13 +37,11 @@ require_once 'Zend/Media/Iso14496/FullBox.php';
 /**#@-*/
 
 /**
- * The <i>Handler Reference Box</i> is within a
- * {@link Zend_Media_Iso14496_Box_Mdia Media Box} declares the process by which
- * the media-data in the track is presented, and thus, the nature of the media
- * in a track. For example, a video track would be handled by a video handler.
- *
- * This box when present within a {@link Zend_Media_Iso14496_Box_Meta Meta Box},
- * declares the structure or format of the <i>meta</i> box contents.
+ * The <i>Copyright Box</i> contains a copyright declaration which applies to
+ * the entire presentation, when contained within the
+ * {@link Zend_Media_Iso14496_Box_Moov Movie Box}, or, when contained in a
+ * track, to that entire track. There may be multiple copyright boxes using
+ * different language codes.
  *
  * @category   Zend
  * @package    Zend_Media
@@ -53,13 +51,13 @@ require_once 'Zend/Media/Iso14496/FullBox.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
-final class Zend_Media_Iso14496_Box_Hdlr extends Zend_Media_Iso14496_FullBox
+final class Zend_Media_Iso14496_Box_Cprt extends Zend_Media_Iso14496_FullBox
 {
     /** @var string */
-    private $_handlerType;
+    private $_language;
 
     /** @var string */
-    private $_name;
+    private $_notice;
 
     /**
      * Constructs the class with given parameters and reads box related data
@@ -67,82 +65,62 @@ final class Zend_Media_Iso14496_Box_Hdlr extends Zend_Media_Iso14496_FullBox
      *
      * @param Zend_Io_Reader $reader  The reader object.
      * @param Array          $options The options array.
+     * @todo Distinguish UTF-16?
      */
-    public function __construct($reader = null, &$options = array())
+    public function __construct($reader, &$options = array())
     {
         parent::__construct($reader, $options);
 
-        if ($reader === null) {
-            return;
-        }
-
-        $this->_reader->skip(4);
-        $this->_handlerType = $this->_reader->read(4);
-        $this->_reader->skip(12);
-        $this->_name = $this->_reader->readString8
+        $this->_language = chr
+            (((($tmp = $this->_reader->readUInt16BE()) >> 10) & 0x1f) + 0x60) .
+            chr((($tmp >> 5) & 0x1f) + 0x60) . chr(($tmp & 0x1f) + 0x60);
+        $this->_notice = $this->_reader->readString8
             ($this->getOffset() + $this->getSize() -
              $this->_reader->getOffset());
     }
 
     /**
-     * Returns the handler type.
+     * Returns the three byte language code to describe the language of the
+     * notice, according to {@link http://www.loc.gov/standards/iso639-2/
+     * ISO 639-2/T}.
      *
-     * When present in a media box, the returned value contains one of the
-     * following values, or a value from a derived specification:
-     *   o <i>vide</i> Video track
-     *   o <i>soun</i> Audio track
-     *   o <i>hint</i> Hint track
-     *
-     * When present in a meta box, the returned value contains an appropriate
-     * value to indicate the format of the meta box contents.
-     *
-     * @return integer
+     * @return string
      */
-    public function getHandlerType() 
+    public function getLanguage() 
     {
-        return $this->_handlerType; 
+        return $this->_language; 
     }
 
     /**
-     * Sets the handler type.
+     * Sets the three byte language code to describe the language of this
+     * media, according to {@link http://www.loc.gov/standards/iso639-2/
+     * ISO 639-2/T}.
      *
-     * When present in a media box, the value must be set to one of the
-     * following values, or a value from a derived specification:
-     *   o <i>vide</i> Video track
-     *   o <i>soun</i> Audio track
-     *   o <i>hint</i> Hint track
-     *
-     * When present in a meta box, the value must be set to an appropriate value
-     * to indicate the format of the meta box contents.
-     *
-     * @param string $handlerType The handler type.
+     * @param string $language The language code.
      */
-    public function setHandlerType($handlerType)
+    public function setLanguage($language)
     {
-        $this->_handlerType = $handlerType;
+        $this->_language = $language;
     }
 
     /**
-     * Returns the name string. The name is in UTF-8 characters and gives a
-     * human-readable name for the track type (for debugging and inspection
-     * purposes).
+     * Returns the copyright notice.
      *
-     * @return integer
+     * @return string
      */
-    public function getName() 
+    public function getNotice()
     {
-        return $this->_name; 
+        return $this->_notice;
     }
 
     /**
-     * Sets the name string. The name must be in UTF-8 and give a human-readable
-     * name for the track type (for debugging and inspection purposes).
+     * Returns the copyright notice.
      *
-     * @param string $name The human-readable description.
+     * @param string $notice The copyright notice.
      */
-    public function setName($name) 
+    public function setNotice($notice)
     {
-        $this->_name = $name; 
+        $this->_notice = $notice;
     }
 
     /**
@@ -152,7 +130,7 @@ final class Zend_Media_Iso14496_Box_Hdlr extends Zend_Media_Iso14496_FullBox
      */
     public function getHeapSize()
     {
-        return parent::getHeapSize() + 21 + strlen($this->_name);
+        return parent::getHeapSize() + 3 + strlen($this->_notice);
     }
 
     /**
@@ -164,11 +142,9 @@ final class Zend_Media_Iso14496_Box_Hdlr extends Zend_Media_Iso14496_FullBox
     protected function _writeData($writer)
     {
         parent::_writeData($writer);
-        $writer->write(str_pad('', 4, "\0"))
-               ->write($this->_handlerType)
-               ->writeUInt32BE(0)
-               ->writeUInt32BE(0)
-               ->writeUInt32BE(0)
-               ->writeString8($this->_name, 1);
+        $writer->writeUInt16BE((ord($this->_language[0]) - 0x60) << 10 |
+                (ord($this->_language[1])- 0x60) << 5 |
+                 (ord($this->_language[2])- 0x60))
+               ->writeString8($this->_notice, 1);
     }
 }

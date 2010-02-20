@@ -37,21 +37,8 @@ require_once 'Zend/Media/Iso14496/FullBox.php';
 /**#@-*/
 
 /**
- * The <i>Chunk Offset Box</i> table gives the index of each chunk into the
- * containing file. There are two variants, permitting the use of 32-bit or
- * 64-bit offsets. The latter is useful when managing very large presentations.
- * At most one of these variants will occur in any single instance of a sample
- * table.
- *
- * Offsets are file offsets, not the offset into any box within the file (e.g.
- * {@link Zend_Media_Iso14496_Box_Mdat Media Data Box}). This permits referring
- * to media data in files without any box structure. It does also mean that care
- * must be taken when constructing a self-contained ISO file with its metadata
- * ({@link Zend_Media_Iso14496_Box_Moov Movie Box}) at the front, as the size of
- * the {@link Zend_Media_Iso14496_Box_Moov Movie Box} will affect the chunk
- * offsets to the media data.
- *
- * This box variant contains 32-bit offsets.
+ * The <i>Hint Media Header Box</i> header contains general information,
+ * independent of the protocol, for hint tracks.
  *
  * @category   Zend
  * @package    Zend_Media
@@ -61,10 +48,19 @@ require_once 'Zend/Media/Iso14496/FullBox.php';
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
-final class Zend_Media_Iso14496_Box_Stco extends Zend_Media_Iso14496_FullBox
+final class Zend_Media_Iso14496_Box_Hmhd extends Zend_Media_Iso14496_FullBox
 {
-    /** @var Array */
-    private $_chunkOffsetTable = array();
+    /** @var integer */
+    private $_maxPDUSize;
+
+    /** @var integer */
+    private $_avgPDUSize;
+
+    /** @var integer */
+    private $_maxBitrate;
+
+    /** @var integer */
+    private $_avgBitrate;
 
     /**
      * Constructs the class with given parameters and reads box related data
@@ -77,34 +73,90 @@ final class Zend_Media_Iso14496_Box_Stco extends Zend_Media_Iso14496_FullBox
     {
         parent::__construct($reader, $options);
 
-        $entryCount = $this->_reader->readUInt32BE();
-        for ($i = 1; $i <= $entryCount; $i++) {
-            $this->_chunkOffsetTable[$i] = $reader->readUInt32BE();
-        }
+        $this->_maxPDUSize = $this->_reader->readUInt16BE();
+        $this->_avgPDUSize = $this->_reader->readUInt16BE();
+        $this->_maxBitrate = $this->_reader->readUInt32BE();
+        $this->_avgBitrate = $this->_reader->readUInt32BE();
     }
 
     /**
-     * Returns an array of values. Each entry has the entry number as its index
-     * and a 32 bit integer that gives the offset of the start of a chunk into
-     * its containing media file as its value.
+     * Returns the size in bytes of the largest PDU in this (hint) stream.
      *
-     * @return Array
+     * @return integer
      */
-    public function getChunkOffsetTable() 
+    public function getMaxPDUSize()
     {
-        return $this->_chunkOffsetTable; 
+        return $this->_maxPDUSize;
     }
 
     /**
-     * Sets an array of chunk offsets. Each entry must have the entry number as
-     * its index and a 32 bit integer that gives the offset of the start of a
-     * chunk into its containing media file as its value.
+     * Returns the size in bytes of the largest PDU in this (hint) stream.
      *
-     * @param Array $chunkOffsetTable The chunk offset array.
+     * @param integer $maxPDUSize The maximum size.
      */
-    public function setChunkOffsetTable($chunkOffsetTable)
+    public function setMaxPDUSize($maxPDUSize)
     {
-        $this->_chunkOffsetTable = $chunkOffsetTable;
+        $this->_maxPDUSize = $maxPDUSize;
+    }
+
+    /**
+     * Returns the average size of a PDU over the entire presentation.
+     *
+     * @return integer
+     */
+    public function getAvgPDUSize()
+    {
+        return $this->_avgPDUSize;
+    }
+
+    /**
+     * Sets the average size of a PDU over the entire presentation.
+     *
+     * @param integer $avgPDUSize The average size.
+     */
+    public function setAvgPDUSize()
+    {
+        $this->_avgPDUSize = $avgPDUSize;
+    }
+
+    /**
+     * Returns the maximum rate in bits/second over any window of one second.
+     *
+     * @return integer
+     */
+    public function getMaxBitrate()
+    {
+        return $this->_maxBitrate;
+    }
+
+    /**
+     * Sets the maximum rate in bits/second over any window of one second.
+     *
+     * @param integer $maxBitrate The maximum bitrate.
+     */
+    public function setMaxBitrate($maxBitrate)
+    {
+        $this->_maxBitrate = $maxBitrate;
+    }
+
+    /**
+     * Returns the average rate in bits/second over the entire presentation.
+     *
+     * @return integer
+     */
+    public function getAvgBitrate()
+    {
+        return $this->_avgBitrate;
+    }
+
+    /**
+     * Sets the average rate in bits/second over the entire presentation.
+     *
+     * @param integer $maxbitrate The agerage bitrate.
+     */
+    public function setAvgBitrate($avgBitrate)
+    {
+        $this->_avgBitrate = $avgBitrate;
     }
 
     /**
@@ -114,7 +166,7 @@ final class Zend_Media_Iso14496_Box_Stco extends Zend_Media_Iso14496_FullBox
      */
     public function getHeapSize()
     {
-        return parent::getHeapSize() + 4 + count($this->_chunkOffsetTable) * 4;
+        return parent::getHeapSize() + 2;
     }
 
     /**
@@ -126,9 +178,10 @@ final class Zend_Media_Iso14496_Box_Stco extends Zend_Media_Iso14496_FullBox
     protected function _writeData($writer)
     {
         parent::_writeData($writer);
-        $writer->writeUInt32BE($entryCount = count($this->_chunkOffsetTable));
-        for ($i = 1; $i <= $entryCount; $i++) {
-            $writer->writeUInt32BE($this->_chunkOffsetTable[$i]);
-        }
+        
+        $writer->writeUInt16BE($this->_maxPDUSize)
+               ->writeUInt16BE($this->_avgPDUSize)
+               ->writeUInt16BE($this->_maxBitrate)
+               ->writeUInt16BE($this->_avgBitrate);
     }
 }
