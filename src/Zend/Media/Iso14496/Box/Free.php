@@ -70,7 +70,7 @@ final class Zend_Media_Iso14496_Box_Free extends Zend_Media_Iso14496_Box
      */
     public function getHeapSize()
     {
-        return parent::getHeapSize() + $this->getSize();
+        return ($this->getSize() >= 8 ? $this->getSize() : 0);
     }
 
     /**
@@ -81,7 +81,9 @@ final class Zend_Media_Iso14496_Box_Free extends Zend_Media_Iso14496_Box
      */
     protected function _writeData($writer)
     {
-        parent::_writeData($writer);
-        $writer->write(str_repeat("\0", $this->getSize()));
+        if ($this->getSize() >= 8) {
+            parent::_writeData($writer);
+            $writer->write(str_repeat("\0", $this->getSize() - 8));
+        }
     }
 }

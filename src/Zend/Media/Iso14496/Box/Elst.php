@@ -67,7 +67,7 @@ final class Zend_Media_Iso14496_Box_Elst extends Zend_Media_Iso14496_FullBox
         parent::__construct($reader, $options);
 
         $entryCount = $this->_reader->readUInt32BE();
-        for ($i = 1; $i <= $entryCount; $i++) {
+        for ($i = 0; $i < $entryCount; $i++) {
             $entry = array();
             if ($this->getVersion() == 1) {
                 $entry['segmentDuration'] = $this->_reader->readInt64BE();
@@ -77,8 +77,8 @@ final class Zend_Media_Iso14496_Box_Elst extends Zend_Media_Iso14496_FullBox
                 $entry['mediaTime'] = $this->_reader->readInt32BE();
             }
             $entry['mediaRate'] =
-                ((($tmp = $this->_reader->readUInt32BE()) >> 16) & 0xffff) +
-                (float)("0." . ((string)($tmp & 0xffff)));
+                (float)($this->_reader->readInt16BE() . "." .
+                    $this->_reader->readInt16BE());
             $this->_entries[] = $entry;
         }
     }
@@ -152,19 +152,18 @@ final class Zend_Media_Iso14496_Box_Elst extends Zend_Media_Iso14496_FullBox
     {
         parent::_writeData($writer);
         $writer->writeUInt32BE($entryCount = count($this->_entries));
-        for ($i = 1; $i <= $entryCount; $i++) {
+        for ($i = 0; $i < $entryCount; $i++) {
             if ($this->getVersion() == 1) {
                 $writer->writeInt64BE($this->_entries[$i]['segmentDuration'])
                        ->writeInt64BE($this->_entries[$i]['mediaTime']);
             } else {
                 $writer->writeUInt32BE($this->_entries[$i]['segmentDuration'])
-                       ->writeUInt32BE($this->_entries[$i]['mediaTime']);
+                       ->writeInt32BE($this->_entries[$i]['mediaTime']);
             }
-            @list(, $mediaRateDecimals) = explode
+            @list($mediaRateInteger, $mediaRateFraction) = explode
                 ('.', (float)$this->_entries[$i]['mediaRate']);
-            $writer->writeUInt32BE
-                (floor($this->_entries[$i]['mediaRate']) << 16 |
-                 $mediaRateDecimals);
+            $writer->writeInt16BE($mediaRateInteger)
+                   ->writeInt16BE($mediaRateFraction);
         }
     }
 }
