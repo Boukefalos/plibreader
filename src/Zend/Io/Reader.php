@@ -570,7 +570,11 @@ class Zend_Io_Reader
             }
         }
 
-        return substr($value, -2) == "\0\0" ? substr($value, 0, -2) : $value;
+        while (substr($value, -2) == "\0\0") {
+            $value = substr($value, 0, -2);
+        }
+
+        return $value;
     }
 
     /**

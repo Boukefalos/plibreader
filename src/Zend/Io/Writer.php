@@ -492,7 +492,7 @@ class Zend_Io_Writer
      * @throws Zend_Io_Exception if <var>length</var> attribute is negative or
      *  if the stream is closed
      */
-    public final function writeHHex($length)
+    public final function writeHHex($value)
     {
         return $this->write(pack('H*', $value));
     }
@@ -506,7 +506,7 @@ class Zend_Io_Writer
      * @throws Zend_Io_Exception if <var>length</var> attribute is negative or
      *  if the stream is closed
      */
-    public final function writeLHex($length)
+    public final function writeLHex($value)
     {
         return $this->write(pack('h*', $value));
     }
@@ -519,7 +519,7 @@ class Zend_Io_Writer
      * @return Zend_Io_Writer
      * @throws Zend_Io_Exception if the stream is closed
      */
-    public final function writeGuid()
+    public final function writeGuid($value)
     {
         $string = '';
         $C = preg_split('/-/', $value);

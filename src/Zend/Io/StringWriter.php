@@ -69,6 +69,9 @@ class Zend_Io_StringWriter extends Zend_Io_Writer
      */
     public function toString()
     {
+        if ($this->getSize() == 0) {
+            return '';
+        }
         $offset = $this->getOffset();
         $this->setOffset(0);
         $data = fread($this->getFileDescriptor(), $this->getSize());
