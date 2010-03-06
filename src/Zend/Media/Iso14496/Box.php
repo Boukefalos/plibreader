@@ -56,10 +56,10 @@ class Zend_Media_Iso14496_Box
     private $_options;
 
     /** @var integer */
-    private $_offset = -1;
+    private $_offset = false;
 
     /** @var integer */
-    private $_size = -1;
+    private $_size = false;
 
     /** @var string */
     private $_type;
@@ -168,7 +168,8 @@ class Zend_Media_Iso14496_Box
     }
 
     /**
-     * Returns the file offset to box start, or -1 if the box was created on heap.
+     * Returns the file offset to box start, or <var>false</var> if the box was
+     * created on heap.
      *
      * @return integer
      */
@@ -189,8 +190,8 @@ class Zend_Media_Iso14496_Box
 
     /**
      * Returns the box size in bytes read from the file, including the size and
-     * type header, fields, and all contained boxes, or -1 if the box was
-     * created on heap.
+     * type header, fields, and all contained boxes, or <var>false</var> if the
+     * box was created on heap.
      *
      * @return integer
      */

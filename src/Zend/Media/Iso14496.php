@@ -301,14 +301,13 @@ final class Zend_Media_Iso14496 extends Zend_Media_Iso14496_Box
     }
 
     /**
-     * Writes the changes back to the original media file. If the class was
-     * constructed without a file name, one can be provided here as an argument.
+     * Writes the changes back to given media file.
      *
      * The write operation commits only changes made to the Movie Box. It
      * further changes the order of the Movie Box and Media Data Box in a way
      * compatible for progressive download from a web page.
      *
-     * All file offsets must be assumed to be invalid after the write operation.
+     * All box offsets must be assumed to be invalid after the write operation.
      *
      * @param string $filename The optional path to the file, use null to save
      *                         to the same file.
@@ -318,7 +317,7 @@ final class Zend_Media_Iso14496 extends Zend_Media_Iso14496_Box
         if ($filename === null && ($filename = $this->_filename) === null) {
             require_once 'Zend/Media/Iso14496/Exception.php';
             throw new Zend_Media_Iso14496_Exception
-                ('No file given to write the tag to');
+                ('No file given to write to');
         } else if ($filename !== null && $this->_filename !== null &&
                    realpath($filename) != realpath($this->_filename) &&
                    !copy($this->_filename, $filename)) {

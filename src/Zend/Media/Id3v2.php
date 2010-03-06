@@ -442,7 +442,7 @@ final class Zend_Media_Id3v2 extends Zend_Media_Id3_Object
         if ($filename === null && ($filename = $this->_filename) === null) {
             require_once 'Zend/Media/Id3/Exception.php';
             throw new Zend_Media_Id3_Exception
-                ('No file given to write the tag to');
+                ('No file given to write to');
         } else if ($filename !== null && $filename instanceof Zend_Io_Writer) {
             require_once 'Zend/Io/Writer.php';
             $this->_writeData($filename);
