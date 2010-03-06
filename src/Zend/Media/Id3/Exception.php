@@ -25,7 +25,7 @@ require_once 'Zend/Media/Exception.php';
 /**#@-*/
 
 /**
- * The ID3_Exception is thrown whenever an error occurs within the
+ * The Zend_Media_Id3_Exception is thrown whenever an error occurs within the
  * {@link Zend_Media_Id3v1} or the {@link Zend_Media_Id3v2} classes.
  *
  * @category   Zend
