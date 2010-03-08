@@ -28,7 +28,7 @@
  * @author     Sven Vollbehr <sven@vollbehr.eu>
  * @author     Ryan Butterfield <buttza@gmail.com>
  * @author     Marc Bennewitz <marc-bennewitz@arcor.de>
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
@@ -274,6 +274,18 @@ class Zend_Io_Reader
     }
 
     /**
+     * Reads 2 bytes from the stream and returns machine ordered binary data
+     * as signed 16-bit integer.
+     *
+     * @return integer
+     * @throws Zend_Io_Exception if an I/O error occurs
+     */
+    public final function readInt16()
+    {
+        return $this->_fromInt16($this->read(2));
+    }
+
+    /**
      * Returns machine endian ordered binary data as unsigned 16-bit integer.
      *
      * @param string  $value The binary data string.
@@ -311,6 +323,18 @@ class Zend_Io_Reader
     public final function readUInt16BE()
     {
         return $this->_fromUInt16($this->read(2), self::BIG_ENDIAN_ORDER);
+    }
+
+    /**
+     * Reads 2 bytes from the stream and returns machine ordered binary data
+     * as unsigned 16-bit integer.
+     *
+     * @return integer
+     * @throws Zend_Io_Exception if an I/O error occurs
+     */
+    public final function readUInt16()
+    {
+        return $this->_fromUInt16($this->read(2), self::MACHINE_ENDIAN_ORDER);
     }
 
     /**
@@ -356,6 +380,18 @@ class Zend_Io_Reader
     }
 
     /**
+     * Reads 4 bytes from the stream and returns machine ordered binary data
+     * as signed 32-bit integer.
+     *
+     * @return integer
+     * @throws Zend_Io_Exception if an I/O error occurs
+     */
+    public final function readInt32()
+    {
+        return $this->_fromInt32($this->read(4));
+    }
+
+    /**
      * Reads 4 bytes from the stream and returns little-endian ordered binary
      * data as unsigned 32-bit integer.
      *
@@ -387,6 +423,24 @@ class Zend_Io_Reader
             return $hi * (0xffff+1) + $lo; // eq $hi << 16 | $lo
         } else {
             list(, $int) = unpack('N*', $this->read(4));
+            return $int;
+        }
+    }
+
+    /**
+     * Reads 4 bytes from the stream and returns machine ordered binary data
+     * as unsigned 32-bit integer.
+     *
+     * @return integer
+     * @throws Zend_Io_Exception if an I/O error occurs
+     */
+    public final function readUInt32()
+    {
+        if (PHP_INT_SIZE < 8) {
+            list(, $hi, $lo) = unpack('L*', $this->read(4));
+            return $hi * (0xffff+1) + $lo; // eq $hi << 16 | $lo
+        } else {
+            list(, $int) = unpack('L*', $this->read(4));
             return $int;
         }
     }

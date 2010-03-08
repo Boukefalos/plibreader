@@ -57,7 +57,7 @@ require_once 'Zend/Io/FileReader.php';
  * @category   Zend
  * @package    Zend_Mime
  * @author     Sven Vollbehr <sven@vollbehr.eu>
- * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
+ * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
@@ -89,7 +89,7 @@ final class Zend_Mime_Magic
      * @param string $default  The default value.
      * @return string|false
      */
-    public function getType($filename, $default = null)
+    public function getMimeType($filename, $default = null)
     {
         $reader = new Zend_Io_FileReader($filename);
 
@@ -98,8 +98,8 @@ final class Zend_Mime_Magic
             $chunks = array();
             if (!preg_match("/^(?P<Dependant>>?)(?P<Byte>\d+)\s+(?P<MatchType" .
                             ">\S+)\s+(?P<MatchData>\S+)(?:\s+(?P<MIMEType>[a-" .
-                            "z]+\/[a-z-0-9]+)?(?:\s+(?P<Description>.+))?)?$/",
-                    $line, $chunks)) {
+                            "z]+\/[a-z-0-9]+)?(?:\s+(?P<Description>.?+))?)?$/",
+                            $line, $chunks)) {
                 continue;
             }
 
@@ -161,10 +161,34 @@ final class Zend_Mime_Magic
                     return $chunks['MIMEType'];
                 }
                 if (!empty($chunks['Description'])) {
-                    return $chunks['Description'];
+                    return rtrim($chunks['Description'], "\n");
                 }
             }
         }
         return $default;
+    }
+
+    /**
+     * Returns the results of the mime type check either as a boolean or an
+     * array of boolean values.
+     *
+     * @param string|Array $filename The file path whose type to test.
+     * @param string|Array $mimeType The mime type to test against.
+     * @return boolean|Array
+     */
+    public function isMimeType($filename, $mimeType)
+    {
+        if (is_array($filename)) {
+            $result = array();
+            foreach ($filename as $key => $value) {
+                $result[] =
+                    ($this->getMimeType($value) ==
+                     (is_array($mimeType) ? $mimeType[$key] : $mimeType)) ?
+                    true : false;
+            }
+            return $result;
+        } else {
+            return $this->getMimeType($filename) == $mimeType ? true : false;
+        }
     }
 }
