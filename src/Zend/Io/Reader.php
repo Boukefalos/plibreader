@@ -451,7 +451,7 @@ class Zend_Io_Reader
      *
      * {@internal PHP does not support 64-bit integers as the long
      * integer is of 32-bits but using aritmetic operations it is implicitly
-     * converted into floating point which is of 64-bits long.}
+     * converted into floating point which is of 64-bits long.}}
      *
      * @return integer
      * @throws Zend_Io_Exception if an I/O error occurs
@@ -469,7 +469,7 @@ class Zend_Io_Reader
      *
      * {@internal PHP does not support 64-bit integers as the long integer is of
      * 32-bits but using aritmetic operations it is implicitly converted into
-     * floating point which is of 64-bits long.}
+     * floating point which is of 64-bits long.}}
      *
      * @return integer
      * @throws Zend_Io_Exception if an I/O error occurs

@@ -26,7 +26,7 @@
  *
  * @category   Zend
  * @package    Zend_Media
- * @subpackage ISO 14496
+ * @subpackage ISO14496
  * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
@@ -70,7 +70,7 @@ require_once 'Zend/Media/Iso14496/Box.php';
  *
  * @category   Zend
  * @package    Zend_Media
- * @subpackage ISO 14496
+ * @subpackage ISO14496
  * @author     Sven Vollbehr <sven@vollbehr.eu>
  * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
@@ -130,7 +130,7 @@ final class Zend_Media_Iso14496_Box_Ilst extends Zend_Media_Iso14496_Box
  *
  * @category   Zend
  * @package    Zend_Media
- * @subpackage ISO 14496
+ * @subpackage ISO14496
  * @author     Sven Vollbehr <sven@vollbehr.eu>
  * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
@@ -171,7 +171,7 @@ require_once 'Zend/Media/Iso14496/FullBox.php';
  *
  * @category   Zend
  * @package    Zend_Media
- * @subpackage ISO 14496
+ * @subpackage ISO14496
  * @author     Sven Vollbehr <sven@vollbehr.eu>
  * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License

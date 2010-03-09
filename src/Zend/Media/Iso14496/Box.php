@@ -26,7 +26,7 @@
  *
  * @category   Zend
  * @package    Zend_Media
- * @subpackage ISO 14496
+ * @subpackage ISO14496
  * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
@@ -37,7 +37,7 @@
  *
  * @category   Zend
  * @package    Zend_Media
- * @subpackage ISO 14496
+ * @subpackage ISO14496
  * @author     Sven Vollbehr <sven@vollbehr.eu>
  * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com) 
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
@@ -104,6 +104,9 @@ class Zend_Media_Iso14496_Box
         $this->_options = &$options;
     }
 
+    /**
+     * Releases any references to contained boxes and the parent.
+     */
     public function __destruct()
     {
         unset($this->_boxes);

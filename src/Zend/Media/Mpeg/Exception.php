@@ -20,6 +20,10 @@
  * @version    $Id$
  */
 
+/**#@+ @ignore */
+require_once 'Zend/Media/Exception.php';
+/**#@-*/
+
 /**
  * The Zend_Media_Mpeg_Exception is thrown whenever an error occurs within the
  * MPEG family of classes.
@@ -32,6 +36,5 @@
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @version    $Id$
  */
-class Zend_Media_Mpeg_Exception extends Exception
-{
-}
+class Zend_Media_Mpeg_Exception extends Zend_Media_Exception
+{}
