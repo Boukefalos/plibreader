@@ -1,0 +1,14 @@
+{
+    "name": "svollbehr/php-reader",
+    "description": "The best PHP library for Object-Oriented media file information reading and writing.",
+    "keywords": [],
+    "homepage": "https://code.google.com/p/php-reader/",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "svollbehr",
+            "email": " svollbehr@gmail.com"
+        }
+    ]
+}
